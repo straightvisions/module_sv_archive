@@ -1,0 +1,3 @@
+[submodule "lib/template_sv_archive_list"]
+	path = lib/template_sv_archive_list
+	url = ../template_sv_archive_list
