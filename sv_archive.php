@@ -2,7 +2,8 @@
 	namespace sv100;
 
 	class sv_archive extends init {
-		private $archive_types	= array();
+		private $archive_types				= array();
+		private static $loaded_templates	= array();
 
 		public function init() {
 			// set available
@@ -35,6 +36,17 @@
 
 			return $this;
 		}
+		public function get_loaded_templates(): array{
+			return self::$loaded_templates;
+		}
+		public function get_loaded_template(string $slug){
+			return $this->get_loaded_templates()[$slug];
+		}
+		private function add_loaded_template($slug, $template): sv_archive{
+			self::$loaded_templates[$slug]	= $template;
+
+			return $this;
+		}
 		public function has_archive_type(string $archive_type): bool{
 			if(isset($this->get_archive_types()[$archive_type])){
 				return true;
@@ -57,47 +69,9 @@
 					->set_default_value('template_sv_archive_list')
 					->load_type( 'select' );
 
-				$this->get_setting($slug.'_show_featured_image')
-					->set_title( __( 'Show Featured Image', 'sv100' ) )
-					->set_description( __( 'Show or Hide this Template Part', 'sv100' ) )
-					->set_default_value(1)
-					->load_type( 'checkbox' );
+				$template_class_name	= $this->get_setting($slug.'_template')->get_data();
 
-				$this->get_setting($slug.'_show_title')
-					->set_title( __( 'Show Title', 'sv100' ) )
-					->set_description( __( 'Show or Hide this Template Part', 'sv100' ) )
-					->set_default_value(1)
-					->load_type( 'checkbox' );
-
-				$this->get_setting($slug.'_show_excerpt')
-					->set_title( __( 'Show Excerpt', 'sv100' ) )
-					->set_description( __( 'Show or Hide this Template Part', 'sv100' ) )
-					->set_default_value(1)
-					->load_type( 'checkbox' );
-
-				$this->get_setting($slug.'_show_read_more')
-					->set_title( __( 'Show Read More', 'sv100' ) )
-					->set_description( __( 'Show or Hide this Template Part', 'sv100' ) )
-					->set_default_value(1)
-					->load_type( 'checkbox' );
-
-				$this->get_setting($slug.'_show_date')
-					->set_title( __( 'Show Date', 'sv100' ) )
-					->set_description( __( 'Show or Hide this Template Part', 'sv100' ) )
-					->set_default_value(1)
-					->load_type( 'checkbox' );
-
-				$this->get_setting($slug.'_show_date_modified')
-					->set_title( __( 'Show Date Modified', 'sv100' ) )
-					->set_description( __( 'Show or Hide this Template Part', 'sv100' ) )
-					->set_default_value(0)
-					->load_type( 'checkbox' );
-
-				$this->get_setting($slug.'_show_categories')
-					->set_title( __( 'Show Categories', 'sv100' ) )
-					->set_description( __( 'Show or Hide this Template Part', 'sv100' ) )
-					->set_default_value(1)
-					->load_type( 'checkbox' );
+				$this->add_loaded_template($slug,new $template_class_name($this, $slug));
 			}
 
 			return $this;
@@ -115,15 +89,7 @@
 				$template_class_name = $this->get_setting($archive_type . '_template')->get_data();
 
 				// set template properties
-				$template = new $template_class_name($this, array(
-					'show_featured_image' => boolval($this->get_setting($archive_type . '_show_featured_image')->get_data()),
-					'show_title' => boolval($this->get_setting($archive_type . '_show_title')->get_data()),
-					'show_excerpt' => boolval($this->get_setting($archive_type . '_show_excerpt')->get_data()),
-					'show_read_more' => boolval($this->get_setting($archive_type . '_show_read_more')->get_data()),
-					'show_date' => boolval($this->get_setting($archive_type . '_show_date')->get_data()),
-					'show_date_modified' => boolval($this->get_setting($archive_type . '_show_date_modified')->get_data()),
-					'show_categories' => boolval($this->get_setting($archive_type . '_show_categories')->get_data())
-				));
+				$template = new $template_class_name($this, $archive_type);
 
 				// get output
 				$archive = $template->get_output();
