@@ -24,7 +24,7 @@
 				->set_section_desc( $this->get_module_desc() )
 				->set_section_template_path()
 				->set_section_order(3100)
-				->set_section_icon('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M20.822 18.096c-3.439-.794-6.64-1.49-5.09-4.418 4.72-8.912 1.251-13.678-3.732-13.678-5.082 0-8.464 4.949-3.732 13.678 1.597 2.945-1.725 3.641-5.09 4.418-3.073.71-3.188 2.236-3.178 4.904l.004 1h23.99l.004-.969c.012-2.688-.092-4.222-3.176-4.935z"/></svg>')
+				->set_section_icon('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M1.8 9l-.8-4h22l-.8 4h-2.029l.39-2h-17.122l.414 2h-2.053zm18.575-6l.604-2h-17.979l.688 2h16.687zm3.625 8l-2 13h-20l-2-13h24zm-8 4c0-.552-.447-1-1-1h-6c-.553 0-1 .448-1 1s.447 1 1 1h6c.553 0 1-.448 1-1z"/></svg>')
 				->get_root()
 				->add_section( $this );
 		}
@@ -62,7 +62,7 @@
 			}
 
 			foreach($this->get_archive_types() as $slug => $label){
-				$this->get_setting($slug.'_template')
+				$this->get_setting($slug.'_template', __('Common', 'sv100'))
 					->set_title( __( 'Template', 'sv100' ) )
 					->set_description( __( 'Choose a visual style for this archive type', 'sv100' ) )
 					->set_options( $templates )
@@ -71,7 +71,7 @@
 
 				$template_class_name	= $this->get_setting($slug.'_template')->get_data();
 
-				$this->add_loaded_template($slug,new $template_class_name($this, $slug));
+				$this->add_loaded_template($slug, new $template_class_name($this, $slug));
 			}
 
 			return $this;
@@ -85,18 +85,12 @@
 				$this->get_script('common')
 					->set_is_enqueued();
 
-				// Load Template
-				$template_class_name = $this->get_setting($archive_type . '_template')->get_data();
-
-				// set template properties
-				$template = new $template_class_name($this, $archive_type);
-
 				// get output
-				$archive = $template->get_output();
+				$archive = $this->get_loaded_template($archive_type)->get_output();
 
 				$pagination = $this->get_module('sv_pagination') ? $this->get_module('sv_pagination')->load() : '';
 
-				$output = $archive . $pagination;
+				$output = '<div class="'.$this->get_prefix().'">'.$archive . $pagination.'</div>';
 			}
 
 			return $this->get_header().$output.$this->get_footer();
@@ -115,32 +109,5 @@
 			$output		= ob_get_clean();
 
 			return $output;
-		}
-		protected function get_category(){
-			if(is_category()) {
-				return get_category(get_query_var('cat'));
-			} elseif(isset(get_the_category()[0])) {
-				return get_the_category()[0];
-			}else{
-				return false;
-			}
-		}
-		protected function get_category_field(string $field): string{
-			if(!$this->get_category()){
-				return '';
-			}
-
-			return $this->get_category()->$field;
-		}
-		protected function get_category_image(): string{
-			if(!function_exists('z_taxonomy_image_url')){
-				return '';
-			}
-
-			if(!$this->get_category()){
-				return '';
-			}
-
-			return '<img src="'.z_taxonomy_image_url($this->get_category()->term_id, 'full', true).'" alt="" />"';
 		}
 	}
