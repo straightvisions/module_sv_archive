@@ -94,23 +94,8 @@
 
 							// load extra style settings
 							foreach($instance->get_settings() as $setting){
-								//var_dump($extra_style[$setting->get_ID()]);
-
 								$setting->set_data($extra_style[$setting->get_ID()]);
 							}
-							/*foreach($instance->get_settings() as $setting){
-								var_dump($setting->get_data());
-							}*/
-
-							//var_dump($instance->get_setting('archive_show_header')->get_ID());
-							//var_dump($instance->get_setting('archive_show_header')->get_data());
-
-							/*
-							var_dump($extra_style['archive_show_date']);
-							var_dump($instance->get_setting('archive_show_date')->get_data());
-							$instance->get_setting('archive_show_date')->set_data($extra_style['archive_show_date']);
-							var_dump($instance->get_setting('archive_show_date')->get_data());*/
-							//die('end');
 
 							$this->add_loaded_template($extra_style['slug'], $instance);
 						}
@@ -121,12 +106,28 @@
 			return $this;
 		}
 
+		public function has_extra_style(string $extra_style){
+			$extra_styles		= $this->get_setting('extra_styles')->get_data();
+
+			if(!$extra_styles || !is_array($extra_styles) | !count($extra_styles) === 0){
+				return false;
+			}
+
+			foreach($extra_styles as $style){
+				if($style['slug'] == $extra_style){
+					return true;
+				}
+			}
+
+			return false;
+		}
+
 		public function load(string $archive_type = 'archive') {
 			// Extra Style selected for this category?
 			if($this->get_instance('sv100_companion')) {
 				$cat_template_style = $this->get_instance('sv100_companion')->modules->sv_categories->get_template_style();
 
-				if(strlen($cat_template_style) > 0){
+				if(strlen($cat_template_style) > 0 && $this->has_extra_style($cat_template_style)){
 					$archive_type	= 'extra_style';
 				}
 			}else{
