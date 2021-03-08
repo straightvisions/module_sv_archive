@@ -27,7 +27,7 @@
 				->get_root()
 				->add_section( $this );
 
-			add_action('wp', array($this, 'go'));
+			$this->load_settings();
 		}
 		public function go(): sv_archive{
 			$this->load_settings();
