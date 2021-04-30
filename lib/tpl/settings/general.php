@@ -15,12 +15,19 @@
 			echo $module->get_setting( $slug.'_show_date' )->form();
 			echo $module->get_setting( $slug.'_show_date_modified' )->form();
 			echo $module->get_setting( $slug.'_show_categories' )->form();
+			echo $module->get_setting( $slug.'_show_sidebar_top' )->form();
+			echo $module->get_setting( $slug.'_show_sidebar_right' )->form();
+			echo $module->get_setting( $slug.'_show_sidebar_bottom' )->form();
+			echo $module->get_setting( $slug.'_show_sidebar_left' )->form();
 		?>
 	</div>
 	<h3 class="divider"><?php _e( 'Common', 'sv100' ); ?></h3>
 	<div class="sv_setting_flex">
 		<?php
 			echo $module->get_setting( $slug.'_template' )->form();
+			echo $module->get_setting( $slug.'_stack_active' )->form();
+			echo $module->get_setting( $slug.'_max_width_wrapper_outer' )->form();
+			echo $module->get_setting( $slug.'_max_width_wrapper_inner' )->form();
 			echo $module->get_setting( $slug.'_font' )->form();
 			echo $module->get_setting( $slug.'_font_size' )->form();
 			echo $module->get_setting( $slug.'_line_height' )->form();
@@ -48,7 +55,7 @@
 				continue;
 			}
 
-			echo '<h3 class="divider">' . $properties['label'] . '</h3>';
+			echo '<h3 class="divider">'.__($properties['label'],'sv100').'</h3>';
 			echo '<div class="sv_setting_flex">';
 			echo $module->get_setting($slug . '_' . $part . '_order')->form();
 			echo $module->get_setting($slug . '_' . $part . '_font')->form();
@@ -56,6 +63,8 @@
 			echo $module->get_setting($slug . '_' . $part . '_line_height')->form();
 			echo $module->get_setting($slug . '_' . $part . '_text_color')->form();
 			echo $module->get_setting($slug . '_' . $part . '_bg_color')->form();
+			echo $module->get_setting($slug . '_' . $part . '_text_color_hover')->form();
+			echo $module->get_setting($slug . '_' . $part . '_bg_color_hover')->form();
 			echo '</div>';
 			echo '<div class="sv_setting_flex">';
 			echo $module->get_setting($slug . '_' . $part . '_margin')->form();

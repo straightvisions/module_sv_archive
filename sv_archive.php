@@ -3,6 +3,7 @@
 
 	class sv_archive extends init {
 		private $archive_types				= array();
+		private $active_archive_type		= '';
 		private static $loaded_templates	= array();
 
 		public function init() {
@@ -24,6 +25,7 @@
 				->set_section_template_path()
 				->set_section_order(3100)
 				->set_section_icon('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M1.8 9l-.8-4h22l-.8 4h-2.029l.39-2h-17.122l.414 2h-2.053zm18.575-6l.604-2h-17.979l.688 2h16.687zm3.625 8l-2 13h-20l-2-13h24zm-8 4c0-.552-.447-1-1-1h-6c-.553 0-1 .448-1 1s.447 1 1 1h6c.553 0 1-.448 1-1z"/></svg>')
+				->register_sidebars()
 				->get_root()
 				->add_section( $this );
 
@@ -33,6 +35,14 @@
 			$this->load_settings();
 
 			return $this;
+		}
+		public function set_active_archive_type(string $archive_type): sv_archive{
+			$this->active_archive_type		= $archive_type;
+
+			return $this;
+		}
+		public function get_active_archive_type(): string{
+			return $this->active_archive_type;
 		}
 		public function get_archive_types(): array{
 			return $this->archive_types;
@@ -75,9 +85,53 @@
 					->set_default_value('template_sv_archive_list')
 					->load_type( 'select' );
 
+				$this->get_setting($slug.'_max_width_wrapper_outer', __('Common', 'sv100'))
+					->set_title( __( 'Max Width Outer Wrapper', 'sv100' ) )
+					->set_description( __( 'Set the max width of the outer archive wrapper.', 'sv100' ) )
+					->set_options( $this->get_module('sv_common') ? $this->get_module('sv_common')->get_max_width_options() : array('' => __('Please activate module SV Common for this Feature.', 'sv100')) )
+					->set_default_value( $this->get_module('sv_common')->get_setting('max_width_alignfull')->get_data() )
+					->set_is_responsive(true)
+					->load_type( 'select' );
+
+				$this->get_setting($slug.'_max_width_wrapper_inner', __('Common', 'sv100'))
+					->set_title( __( 'Max Width Inner Wrapper', 'sv100' ) )
+					->set_description( __( 'Set the max width of the inner archive wrapper.', 'sv100' ) )
+					->set_options( $this->get_module('sv_common') ? $this->get_module('sv_common')->get_max_width_options() : array('' => __('Please activate module SV Common for this Feature.', 'sv100')) )
+					->set_default_value( $this->get_module('sv_common')->get_setting('max_width_alignwide')->get_data() )
+					->set_is_responsive(true)
+					->load_type( 'select' );
+
+				$this->get_setting($slug.'_show_sidebar_top', __('Parts', 'sv100'))
+					->set_title( __( 'Show Top Archive Sidebar', 'sv100' ) )
+					->set_description( __( 'Show or Hide this Template Part', 'sv100' ) )
+					->set_default_value(0)
+					->load_type( 'checkbox' );
+
+				$this->get_setting($slug.'_show_sidebar_right', __('Parts', 'sv100'))
+					->set_title( __( 'Show Right Archive Sidebar', 'sv100' ) )
+					->set_description( __( 'Show or Hide this Template Part', 'sv100' ) )
+					->set_default_value(0)
+					->load_type( 'checkbox' );
+
+				$this->get_setting($slug.'_show_sidebar_bottom', __('Parts', 'sv100'))
+					->set_title( __( 'Show Bottom Archive Sidebar', 'sv100' ) )
+					->set_description( __( 'Show or Hide this Template Part', 'sv100' ) )
+					->set_default_value(0)
+					->load_type( 'checkbox' );
+
+				$this->get_setting($slug.'_show_sidebar_left', __('Parts', 'sv100'))
+					->set_title( __( 'Show Left Archive Sidebar', 'sv100' ) )
+					->set_description( __( 'Show or Hide this Template Part', 'sv100' ) )
+					->set_default_value(0)
+					->load_type( 'checkbox' );
+
 				$template_class_name	= $this->get_setting($slug.'_template')->get_data();
 
-				$this->add_loaded_template($slug, new $template_class_name($this, $slug));
+				if(class_exists($template_class_name)){
+					$this->add_loaded_template($slug, new $template_class_name($this, $slug));
+				}else{
+					echo '<div class="notice">'.__('Template Class "'.var_export($template_class_name,true).'" not found', 'sv100').'</div>';
+				}
 			}
 
 			// Extra Style selected for this category?
@@ -123,6 +177,8 @@
 		}
 
 		public function load(string $archive_type = 'archive') {
+			$this->set_active_archive_type($archive_type);
+
 			// Extra Style selected for this category?
 			if($this->get_instance('sv100_companion')) {
 				$cat_template_style = $this->get_instance('sv100_companion')->modules->sv_categories->get_template_style();
@@ -165,5 +221,26 @@
 			$output		= ob_get_clean();
 
 			return $output;
+		}
+		protected function register_sidebars(): sv_archive {
+			if ( $this->get_module( 'sv_sidebar' ) ) {
+				foreach($this->get_archive_types() as $slug => $label){
+					foreach(array(
+								'top'		=> __('Top', 'sv100'),
+								'right'		=> __('Right', 'sv100'),
+								'bottom'	=> __('Bottom', 'sv100'),
+								'left'		=> __('left', 'sv100')
+						) as $location => $location_label){
+						if($this->get_setting($slug.'_show_sidebar_'.$location)->get_data()){
+							$this->get_module( 'sv_sidebar' )
+								->create( $this, $this->get_prefix($slug).'_'.$location )
+								->set_title( $label . ' ' . $location_label )
+								->load_sidebar();
+						}
+					}
+				}
+			}
+
+			return $this;
 		}
 	}
