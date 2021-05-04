@@ -179,6 +179,8 @@
 		public function load(string $archive_type = 'archive') {
 			$this->set_active_archive_type($archive_type);
 
+			$header		= $this->get_header();
+
 			// Extra Style selected for this category?
 			if($this->get_instance('sv100_companion')) {
 				$cat_template_style = $this->get_instance('sv100_companion')->modules->sv_categories->get_template_style();
@@ -205,7 +207,9 @@
 				$output = '<div class="'.$this->get_prefix().'">'.$archive . $pagination.'</div>';
 			}
 
-			return $this->get_header().$output.$this->get_footer();
+			$footer		= $this->get_footer();
+
+			return $header.$output.$footer;
 		}
 		protected function get_header(): string {
 			ob_start();
