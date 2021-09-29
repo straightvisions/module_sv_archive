@@ -25,7 +25,6 @@
 				->set_section_template_path()
 				->set_section_order(3100)
 				->set_section_icon('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M1.8 9l-.8-4h22l-.8 4h-2.029l.39-2h-17.122l.414 2h-2.053zm18.575-6l.604-2h-17.979l.688 2h16.687zm3.625 8l-2 13h-20l-2-13h24zm-8 4c0-.552-.447-1-1-1h-6c-.553 0-1 .448-1 1s.447 1 1 1h6c.553 0 1-.448 1-1z"/></svg>')
-				->register_sidebars()
 				->get_root()
 				->add_section( $this );
 
@@ -117,29 +116,29 @@
 					->set_is_responsive(true)
 					->load_type( 'select' );
 
-				$this->get_setting($slug.'_show_sidebar_top', __('Parts', 'sv100'))
-					->set_title( __( 'Show Top Archive Sidebar', 'sv100' ) )
-					->set_description( __( 'Show or Hide this Template Part', 'sv100' ) )
-					->set_default_value(0)
-					->load_type( 'checkbox' );
+				$this->get_setting( $slug.'_show_sidebar_top', __('Parts', 'sv100') )
+					->set_title( __( 'Sidebar Top', 'sv100' ) )
+					->set_description( __( 'Select Sidebar for top position.', 'sv100' ) )
+					->set_options( $this->get_module('sv_sidebar') ? $this->get_module('sv_sidebar')->get_sidebars_for_settings_options() : array('' => __('Please activate module SV Sidebar for this Feature.', 'sv100')) )
+					->load_type( 'select' );
 
-				$this->get_setting($slug.'_show_sidebar_right', __('Parts', 'sv100'))
-					->set_title( __( 'Show Right Archive Sidebar', 'sv100' ) )
-					->set_description( __( 'Show or Hide this Template Part', 'sv100' ) )
-					->set_default_value(0)
-					->load_type( 'checkbox' );
+				$this->get_setting( $slug.'_show_sidebar_right', __('Parts', 'sv100') )
+					->set_title( __( 'Sidebar Right', 'sv100' ) )
+					->set_description( __( 'Select Sidebar for right position.', 'sv100' ) )
+					->set_options( $this->get_module('sv_sidebar') ? $this->get_module('sv_sidebar')->get_sidebars_for_settings_options() : array('' => __('Please activate module SV Sidebar for this Feature.', 'sv100')) )
+					->load_type( 'select' );
 
-				$this->get_setting($slug.'_show_sidebar_bottom', __('Parts', 'sv100'))
-					->set_title( __( 'Show Bottom Archive Sidebar', 'sv100' ) )
-					->set_description( __( 'Show or Hide this Template Part', 'sv100' ) )
-					->set_default_value(0)
-					->load_type( 'checkbox' );
+				$this->get_setting( $slug.'_show_sidebar_bottom', __('Parts', 'sv100') )
+					->set_title( __( 'Sidebar Bottom', 'sv100' ) )
+					->set_description( __( 'Select Sidebar for bottom position.', 'sv100' ) )
+					->set_options( $this->get_module('sv_sidebar') ? $this->get_module('sv_sidebar')->get_sidebars_for_settings_options() : array('' => __('Please activate module SV Sidebar for this Feature.', 'sv100')) )
+					->load_type( 'select' );
 
-				$this->get_setting($slug.'_show_sidebar_left', __('Parts', 'sv100'))
-					->set_title( __( 'Show Left Archive Sidebar', 'sv100' ) )
-					->set_description( __( 'Show or Hide this Template Part', 'sv100' ) )
-					->set_default_value(0)
-					->load_type( 'checkbox' );
+				$this->get_setting( $slug.'_show_sidebar_left', __('Parts', 'sv100') )
+					->set_title( __( 'Sidebar Left', 'sv100' ) )
+					->set_description( __( 'Select Sidebar for left position.', 'sv100' ) )
+					->set_options( $this->get_module('sv_sidebar') ? $this->get_module('sv_sidebar')->get_sidebars_for_settings_options() : array('' => __('Please activate module SV Sidebar for this Feature.', 'sv100')) )
+					->load_type( 'select' );
 
 				$template_class_name	= $this->get_setting($slug.'_template')->get_data();
 
@@ -241,26 +240,5 @@
 			$output		= ob_get_clean();
 
 			return $output;
-		}
-		protected function register_sidebars(): sv_archive {
-			if ( $this->get_module( 'sv_sidebar' ) ) {
-				foreach($this->get_archive_types() as $slug => $label){
-					foreach(array(
-								'top'		=> __('Top', 'sv100'),
-								'right'		=> __('Right', 'sv100'),
-								'bottom'	=> __('Bottom', 'sv100'),
-								'left'		=> __('left', 'sv100')
-						) as $location => $location_label){
-						if($this->get_setting($slug.'_show_sidebar_'.$location)->get_data()){
-							$this->get_module( 'sv_sidebar' )
-								->create( $this, $this->get_prefix($slug).'_'.$location )
-								->set_title( $label . ' ' . $location_label )
-								->load_sidebar();
-						}
-					}
-				}
-			}
-
-			return $this;
 		}
 	}
