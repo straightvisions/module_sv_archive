@@ -20,7 +20,7 @@
 
 			$this->set_module_title( 'SV Archive' )
 				->set_module_desc( __( 'Archive Template and Settings', $this->get_module_name() ) )
-				->set_section_title( $this->get_module_title() )
+				->set_section_title( __( 'Archive', 'sv100' ) )
 				->set_section_desc( $this->get_module_desc() )
 				->set_section_template_path()
 				->set_section_order(3100)
