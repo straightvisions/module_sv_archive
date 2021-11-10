@@ -221,10 +221,11 @@
 
 				$output = '<div class="'.$this->get_prefix().'">'.$archive . $pagination.'</div>';
 			}
+			echo $header;
+			echo $output;
+			echo $this->get_footer();
 
-			$footer		= $this->get_footer();
-
-			return $header.$output.$footer;
+			return $this;
 		}
 		protected function get_header(): string {
 			ob_start();
