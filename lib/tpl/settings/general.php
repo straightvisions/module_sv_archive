@@ -33,6 +33,7 @@
 			echo $module->get_setting( $slug.'_line_height' )->form();
 			echo $module->get_setting( $slug.'_text_color' )->form();
 			echo $module->get_setting( $slug.'_bg_color' )->form();
+			echo $module->get_setting( $slug.'_column_spacing' )->form();
 			echo $module->get_setting( $slug.'_margin' )->form();
 			echo $module->get_setting( $slug.'_padding' )->form();
 			echo $module->get_setting( $slug.'_border' )->form();
