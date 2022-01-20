@@ -26,6 +26,7 @@
 		<?php
 			echo $module->get_setting( $slug.'_template' )->form();
 			echo $module->get_setting( $slug.'_stack_active' )->form();
+			echo $module->get_setting( $slug.'_columns' )->form();
 			echo $module->get_setting( $slug.'_max_width_wrapper_outer' )->form();
 			echo $module->get_setting( $slug.'_max_width_wrapper_inner' )->form();
 			echo $module->get_setting( $slug.'_font' )->form();
