@@ -25,6 +25,7 @@
 				->set_section_template_path()
 				->set_section_order(3100)
 				->set_section_icon('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M1.8 9l-.8-4h22l-.8 4h-2.029l.39-2h-17.122l.414 2h-2.053zm18.575-6l.604-2h-17.979l.688 2h16.687zm3.625 8l-2 13h-20l-2-13h24zm-8 4c0-.552-.447-1-1-1h-6c-.553 0-1 .448-1 1s.447 1 1 1h6c.553 0 1-.448 1-1z"/></svg>')
+				->load_settings()
 				->get_root()
 				->add_section( $this );
 
@@ -44,12 +45,7 @@
 				return $title;
 			});
 
-			$this->load_settings();
-		}
-		public function go(): sv_archive{
-			$this->load_settings();
-
-			return $this;
+			//add_action('init', array($this,'load_settings'));
 		}
 		public function set_active_archive_type(string $archive_type): sv_archive{
 			$this->active_archive_type		= $archive_type;
@@ -149,24 +145,33 @@
 				}
 			}
 
+			return $this;
+		}
+
+		public function load_extra_styles(): sv_archive {
 			// Extra Style selected for this category?
 			if($this->get_instance('sv100_companion')) {
-				$cat_template_style		= $this->get_instance('sv100_companion')->modules->sv_categories->get_template_style();
+				$cat_template_style		= $this->get_instance('sv100_companion')->get_module('sv_categories')->get_template_style();
 
 				if(strlen($cat_template_style) > 0) {
 					$extra_styles		= $this->get_setting('extra_styles')->get_data();
 
 					if ($extra_styles && is_array($extra_styles) && count($extra_styles) > 0) {
 						foreach ($extra_styles as $extra_style) {
-							$template_class_name	= $extra_style['archive_template'];
-							$instance				= new $template_class_name($this, 'archive');
+							if(isset($extra_style['archive_template'])) {
+								$template_class_name = $extra_style['archive_template'];
 
-							// load extra style settings
-							foreach($instance->get_settings() as $setting){
-								$setting->set_data($extra_style[$setting->get_ID()]);
+								if (class_exists($template_class_name)) {
+									$instance = new $template_class_name($this, 'archive');
+
+									// load extra style settings
+									foreach ($instance->get_settings() as $setting) {
+										$setting->set_data(isset($extra_style[$setting->get_ID()]) ? $extra_style[$setting->get_ID()] : false);
+									}
+
+									$this->add_loaded_template($extra_style['slug'], $instance);
+								}
 							}
-
-							$this->add_loaded_template($extra_style['slug'], $instance);
 						}
 					}
 				}
@@ -192,13 +197,15 @@
 		}
 
 		public function load(string $archive_type = 'archive') {
+			$this->load_extra_styles();
+
 			$this->set_active_archive_type($archive_type);
 
 			$header		= $this->get_header();
 
 			// Extra Style selected for this category?
 			if($this->get_instance('sv100_companion')) {
-				$cat_template_style = $this->get_instance('sv100_companion')->modules->sv_categories->get_template_style();
+				$cat_template_style = $this->get_instance('sv100_companion')->get_module('sv_categories')->get_template_style();
 
 				if(strlen($cat_template_style) > 0 && $this->has_extra_style($cat_template_style)){
 					$archive_type	= 'extra_style';
@@ -211,8 +218,7 @@
 				$output				= '<p>'.__('Section', 'sv100').' <strong>'.$archive_type.'</strong> '.__('not found.','sv100').'</p>';
 			}else {
 				// Load Styles
-				$this->get_script('common')
-					->set_is_enqueued();
+				$this->get_script('common')->set_is_enqueued();
 
 				// get output
 				$archive = $this->get_loaded_template($archive_type == 'extra_style' ? $cat_template_style : $archive_type)->get_output();
