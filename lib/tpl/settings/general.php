@@ -59,6 +59,11 @@
 
 			echo '<h3 class="divider">'.__($properties['label'],'sv100').'</h3>';
 			echo '<div class="sv_setting_flex">';
+
+			if($part === 'header' || boolval($module->get_setting( $slug.'_show_'.$part )->get_data()) !== true) {
+				echo $module->get_setting($slug . '_header_min_height')->form();
+			}
+
 			echo $module->get_setting($slug . '_' . $part . '_order')->form();
 			echo $module->get_setting($slug . '_' . $part . '_font')->form();
 			echo $module->get_setting($slug . '_' . $part . '_font_size')->form();
