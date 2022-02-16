@@ -141,7 +141,9 @@
 				if(class_exists($template_class_name)){
 					$this->add_loaded_template($slug, new $template_class_name($this, $slug));
 				}else{
-					echo '<div class="notice">'.__('Template Class "'.var_export($template_class_name,true).'" not found', 'sv100').'</div>';
+					add_action('admin_notices', function() use($template_class_name){
+						echo '<div class="notice notice-error is-dismissible">'.__('Template Class "'.var_export($template_class_name,true).'" not found', 'sv100').'</div>';
+					});
 				}
 			}
 
