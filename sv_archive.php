@@ -168,7 +168,7 @@
 
 									// load extra style settings
 									foreach ($instance->get_settings() as $setting) {
-										$setting->set_data(isset($extra_style[$setting->get_ID()]) ? $extra_style[$setting->get_ID()] : false);
+										$setting->set_data(isset($extra_style[$setting->get_ID()]) ? $extra_style[$setting->get_ID()] : $setting->get_data());
 									}
 
 									$this->add_loaded_template($extra_style['slug'], $instance);
