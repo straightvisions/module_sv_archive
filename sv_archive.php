@@ -156,23 +156,29 @@
 				$cat_template_style		= $this->get_instance('sv100_companion')->get_module('sv_categories')->get_template_style();
 
 				if(strlen($cat_template_style) > 0) {
-					$extra_styles		= $this->get_setting('extra_styles')->get_data();
+					$extra_styles_temp		= $this->get_setting('extra_styles')->get_data();
 
-					if ($extra_styles && is_array($extra_styles) && count($extra_styles) > 0) {
-						foreach ($extra_styles as $extra_style) {
-							if(isset($extra_style['archive_template'])) {
-								$template_class_name = $extra_style['archive_template'];
+					if ($extra_styles_temp && is_array($extra_styles_temp) && count($extra_styles_temp) > 0) {
+						$cat_template_style = $this->get_instance('sv100_companion')->get_module('sv_categories')->get_template_style();
 
-								if (class_exists($template_class_name)) {
-									$instance = new $template_class_name($this, 'archive');
+						$extra_styles	= array();
+						foreach ($extra_styles_temp as $extra_style_temp) {
+							$extra_styles[$extra_style_temp['slug']]		= $extra_style_temp;
+						}
+						$extra_style	= $extra_styles[$cat_template_style];
 
-									// load extra style settings
-									foreach ($instance->get_settings() as $setting) {
-										$setting->set_data(isset($extra_style[$setting->get_ID()]) ? $extra_style[$setting->get_ID()] : $setting->get_data());
-									}
+						if(isset($extra_style['archive_template'])) {
+							$template_class_name = $extra_style['archive_template'];
 
-									$this->add_loaded_template($extra_style['slug'], $instance);
+							if (class_exists($template_class_name)) {
+								$instance = new $template_class_name($this, 'archive');
+
+								// load extra style settings
+								foreach ($instance->get_settings() as $setting) {
+									$setting->set_data(isset($extra_style[$setting->get_ID()]) ? $extra_style[$setting->get_ID()] : $setting->get_data());
 								}
+
+								$this->add_loaded_template($extra_style['slug'], $instance);
 							}
 						}
 					}
@@ -185,7 +191,7 @@
 		public function has_extra_style(string $extra_style){
 			$extra_styles		= $this->get_setting('extra_styles')->get_data();
 
-			if(!$extra_styles || !is_array($extra_styles) | !count($extra_styles) === 0){
+			if(!$extra_styles || !is_array($extra_styles) | count($extra_styles) === 0){
 				return false;
 			}
 
